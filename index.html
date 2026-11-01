@@ -1,0 +1,190 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex,nofollow">
+<title>Ma cité va parler – notes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout : une colonne de travail — lecteur en haut (collant), puis la note en cours, puis la liste des notes par minute */
+:root{
+  --bg:#eef1f4; --panel:#ffffff; --ink:#18202b; --muted:#5b6675; --line:#d6dce4;
+  --accent:#c8402e; --accent-ink:#ffffff; --ok:#2f7d4f; --ok-bg:#e3f2e8; --tick:#c8402e;
+  --display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  --body:"Atkinson Hyperlegible",ui-sans-serif,system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#12171e; --panel:#1b222c; --ink:#e9edf2; --muted:#9aa5b3; --line:#2c3644;
+  --accent:#ef6a55; --accent-ink:#1a0d0a; --ok:#6fcf97; --ok-bg:#1d3326; --tick:#ef6a55; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12171e; --panel:#1b222c; --ink:#e9edf2; --muted:#9aa5b3; --line:#2c3644;
+  --accent:#ef6a55; --accent-ink:#1a0d0a; --ok:#6fcf97; --ok-bg:#1d3326; --tick:#ef6a55; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font:16px/1.5 var(--body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+header{display:flex;flex-direction:column;gap:4px}
+.eyebrow{font:500 12px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:flex;gap:8px;align-items:center}
+.onair{display:inline-flex;align-items:center;gap:6px;color:var(--accent)}
+.onair::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--accent)}
+h1{font:800 clamp(28px,6vw,40px)/1.05 var(--display);margin:0;text-wrap:balance}
+.lede{margin:0;color:var(--muted);max-width:60ch}
+
+.player{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px;box-shadow:0 6px 20px -14px rgba(0,0,0,.35)}
+.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+button{font:700 15px/1 var(--body);border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:12px 14px;cursor:pointer;min-height:44px}
+button:hover{border-color:var(--muted)}
+button:focus-visible,textarea:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+button:disabled{opacity:.5;cursor:default}
+.play{width:56px;height:56px;border-radius:50%;background:var(--accent);color:var(--accent-ink);border:none;display:grid;place-items:center;padding:0}
+.play svg{width:24px;height:24px;fill:currentColor}
+.clock{font:500 18px/1 var(--mono);font-variant-numeric:tabular-nums;margin-left:auto}
+.clock small{color:var(--muted);font-size:14px}
+.bar{position:relative;height:36px}
+.bar input{position:absolute;inset:0;width:100%;margin:0;accent-color:var(--accent);height:36px;background:transparent}
+.ticks{position:absolute;left:0;right:0;top:0;height:8px;pointer-events:none}
+.ticks span{position:absolute;top:0;width:3px;height:10px;margin-left:-1px;background:var(--tick);border-radius:2px}
+.ticks span.done{background:var(--ok)}
+.add{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+
+.composer{background:var(--panel);border:2px solid var(--accent);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.composer label{font:700 15px/1.2 var(--body);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.tchip{font:500 15px/1 var(--mono);background:var(--accent);color:var(--accent-ink);border-radius:6px;padding:5px 8px}
+textarea{font:16px/1.45 var(--body);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-height:84px;resize:vertical;width:100%;box-sizing:border-box}
+.hint{font-size:14px;color:var(--muted);margin:0}
+.save{background:var(--accent);color:var(--accent-ink);border:none}
+
+.notes{display:flex;flex-direction:column;gap:10px}
+.notes h2{font:600 20px/1.2 var(--display);margin:0;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.notes h2 small{font:400 14px var(--body);color:var(--muted)}
+ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+li{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px;display:grid;grid-template-columns:auto 1fr;gap:6px 12px;align-items:start}
+li.done{opacity:.75}
+.jump{font:500 15px/1 var(--mono);font-variant-numeric:tabular-nums;padding:8px 10px;min-height:36px;background:var(--bg)}
+.txt{min-width:0;overflow-wrap:anywhere;white-space:pre-wrap;padding-top:6px}
+.meta{grid-column:2;display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.pill{font:700 12px/1 var(--body);padding:5px 8px;border-radius:999px;border:1px solid var(--line)}
+.pill.done{background:var(--ok-bg);color:var(--ok);border-color:transparent}
+.meta button{padding:6px 10px;min-height:32px;font-size:13px}
+.danger{color:var(--accent)}
+.empty{background:var(--panel);border:1px dashed var(--line);border-radius:12px;padding:20px;color:var(--muted)}
+.status{font-size:14px;color:var(--muted);min-height:1.2em;margin:0}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+.meta .who{font-size:12px;color:var(--muted,#888);font-weight:600}
+*,*::before,*::after{box-sizing:border-box}html,body{margin:0}
+.namebox{display:flex;flex-direction:column;gap:6px}
+input[type=text]{font:16px/1.4 var(--body);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%;max-width:320px}
+</style></head><body>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow"><span class="onair">Épisode 1</span><span>Montage v15 · 25 min 03</span></div>
+    <h1>Ma cité va parler</h1>
+    <p class="lede">Écoute, et dès que quelque chose cloche, appuie sur « Noter ici ». La minute est prise toute seule : écris juste ce qui ne va pas. Chacun met son prénom, comme ça on sait qui a dit quoi. Tout le monde voit les notes de tout le monde.</p>
+  </header>
+
+  <section class="player" aria-label="Lecteur">
+    <audio id="audio" src="podcast.mp3" preload="metadata"></audio>
+    <div class="row">
+      <button class="play" id="play" aria-label="Lecture"><svg viewBox="0 0 24 24" id="playIcon"><path d="M7 4.5v15l13-7.5z"/></svg></button>
+      <button id="back" aria-label="Reculer de 10 secondes">−10 s</button>
+      <button id="fwd" aria-label="Avancer de 10 secondes">+10 s</button>
+      <div class="clock" aria-live="off"><span id="cur">0:00</span> <small>/ <span id="dur">25:03</span></small></div>
+    </div>
+    <div class="bar">
+      <div class="ticks" id="ticks" aria-hidden="true"></div>
+      <input type="range" id="seek" min="0" max="1536" step="0.1" value="0" aria-label="Position dans le podcast">
+    </div>
+    <div class="row">
+      <button class="add" id="addBtn">Noter ici</button>
+      <span class="hint" id="kbd">Barre d'espace : lecture / pause</span>
+    </div>
+  </section>
+
+  <section class="composer" id="composer" hidden aria-label="Nouvelle note">
+    <div class="namebox"><label for="nameIn">Ton prénom</label><input type="text" id="nameIn" maxlength="40" autocomplete="given-name" placeholder="Ex : Sarah"></div>
+    <label for="noteText">Note à <span class="tchip" id="noteTime">0:00</span>
+      <button id="tMinus" aria-label="Une seconde plus tôt">−1 s</button>
+      <button id="tPlus" aria-label="Une seconde plus tard">+1 s</button>
+    </label>
+    <textarea id="noteText" placeholder="Ex : il reste un ze3ma / la phrase est coupée / on n'entend pas"></textarea>
+    <div class="row">
+      <button class="save" id="saveBtn">Enregistrer la note</button>
+      <button id="cancelBtn">Annuler</button>
+    </div>
+  </section>
+
+  <section class="notes" aria-label="Notes">
+    <h2>Les notes <small id="count"></small></h2>
+    <p class="status" id="status">Chargement des notes…</p>
+    <p class="hint" id="old" hidden></p>
+    <ul id="list"></ul>
+    <div class="empty" id="empty" hidden>Pas encore de note. Lance l'écoute et appuie sur « Noter ici » dès que tu entends un souci.</div>
+  </section>
+</div>
+
+<script>
+const SB='https://rlrazcitmwxfaxlnnfau.supabase.co/rest/v1/podcast_notes', KEY='sb_publishable_aDxEyVMedUiB3D3UVHbmrw_zvbaDUp9';
+const H={apikey:KEY,'Content-Type':'application/json'};
+const $=id=>document.getElementById(id);
+const audio=$('audio'), seek=$('seek');
+const VERSION='v15', EP='ep1';
+let notes=[], noteT=0;
+const fmt=s=>{s=Math.max(0,Math.round(s));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
+const dur=()=>isFinite(audio.duration)&&audio.duration>0?audio.duration:1503;
+const store={get(k){try{return localStorage.getItem(k)||''}catch(e){return ''}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+$('nameIn').value=store.get('prenom');
+
+function setIcon(){ $('playIcon').innerHTML=audio.paused?'<path d="M7 4.5v15l13-7.5z"/>':'<path d="M6 4h4.5v16H6zM13.5 4H18v16h-4.5z"/>'; $('play').setAttribute('aria-label',audio.paused?'Lecture':'Pause'); }
+$('play').onclick=()=>{ audio.paused?audio.play().catch(()=>{}):audio.pause(); };
+audio.addEventListener('play',setIcon); audio.addEventListener('pause',setIcon);
+$('back').onclick=()=>{audio.currentTime=Math.max(0,audio.currentTime-10)};
+$('fwd').onclick=()=>{audio.currentTime=Math.min(dur(),audio.currentTime+10)};
+audio.addEventListener('loadedmetadata',()=>{seek.max=dur();$('dur').textContent=fmt(dur());drawTicks()});
+let dragging=false;
+seek.addEventListener('input',()=>{dragging=true;$('cur').textContent=fmt(seek.value)});
+seek.addEventListener('change',()=>{audio.currentTime=+seek.value;dragging=false});
+audio.addEventListener('timeupdate',()=>{ if(!dragging){seek.value=audio.currentTime;$('cur').textContent=fmt(audio.currentTime)} });
+document.addEventListener('keydown',e=>{ if(e.code==='Space'&&!/TEXTAREA|INPUT|BUTTON/.test(document.activeElement.tagName)){e.preventDefault();$('play').click()} });
+
+function openComposer(){ audio.pause(); noteT=Math.round(audio.currentTime); $('noteTime').textContent=fmt(noteT); $('composer').hidden=false; ($('nameIn').value.trim()?$('noteText'):$('nameIn')).focus(); }
+$('addBtn').onclick=openComposer;
+$('tMinus').onclick=()=>{noteT=Math.max(0,noteT-1);$('noteTime').textContent=fmt(noteT)};
+$('tPlus').onclick=()=>{noteT=Math.min(Math.round(dur()),noteT+1);$('noteTime').textContent=fmt(noteT)};
+$('cancelBtn').onclick=()=>{$('composer').hidden=true;$('noteText').value=''};
+$('saveBtn').onclick=async()=>{
+  const name=$('nameIn').value.trim(), text=$('noteText').value.trim();
+  if(!name){$('nameIn').focus();$('status').textContent='Mets ton prénom avant d’enregistrer.';return}
+  if(!text){$('noteText').focus();return}
+  store.set('prenom',name); $('saveBtn').disabled=true;
+  try{ const r=await fetch(SB,{method:'POST',headers:H,body:JSON.stringify({episode:EP,version:VERSION,t:noteT,name,text})});
+    if(!r.ok) throw 0;
+    $('noteText').value=''; $('composer').hidden=true; $('status').textContent='Note enregistrée à '+fmt(noteT)+'. Merci !'; load();
+  }catch(e){ $('status').textContent="La note n'a pas pu être enregistrée. Vérifie ta connexion et réessaie."; }
+  $('saveBtn').disabled=false;
+};
+
+function drawTicks(){ const d=dur(); $('ticks').innerHTML=notes.map(n=>`<span class="${n.done?'done':''}" style="left:${(n.t/d*100).toFixed(2)}%"></span>`).join(''); }
+function render(){
+  const open=notes.filter(n=>!n.done).length;
+  $('count').textContent=notes.length?`${notes.length} note${notes.length>1?'s':''} · ${open} à corriger`:'';
+  $('empty').hidden=notes.length>0;
+  const list=$('list'); list.innerHTML='';
+  for(const n of notes){
+    const li=document.createElement('li'); if(n.done) li.className='done';
+    const jb=document.createElement('button'); jb.className='jump'; jb.textContent=fmt(n.t); jb.setAttribute('aria-label','Écouter à '+fmt(n.t));
+    jb.onclick=()=>{audio.currentTime=Math.max(0,n.t-3);audio.play().catch(()=>{})};
+    const tx=document.createElement('div'); tx.className='txt'; tx.textContent=n.text;
+    const meta=document.createElement('div'); meta.className='meta';
+    const who=document.createElement('span'); who.className='who'; who.textContent=n.name;
+    const pill=document.createElement('span'); pill.className='pill'+(n.done?' done':''); pill.textContent=n.done?'Corrigé':'À corriger';
+    meta.append(who,pill); li.append(jb,tx,meta); list.append(li);
+  }
+  drawTicks();
+}
+async function load(){
+  try{ const r=await fetch(`${SB}?select=id,t,name,text,done&episode=eq.${EP}&version=eq.${VERSION}&order=t.asc,created_at.asc`,{headers:H});
+    if(!r.ok) throw 0; notes=await r.json(); if(/Chargement|pas disponibles/.test($('status').textContent)) $('status').textContent=''; render();
+  }catch(e){ $('status').textContent="Les notes ne sont pas disponibles pour le moment."; }
+}
+load(); setInterval(()=>{ if(!document.hidden) load(); },20000);
+</script>
+</body></html>
