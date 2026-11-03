@@ -76,23 +76,23 @@ input[type=text]{font:16px/1.4 var(--body);color:var(--ink);background:var(--bg)
 
 <div class="wrap">
   <header>
-    <div class="eyebrow"><span class="onair">Épisode 1</span><span>Montage v20 · 35 min 42</span></div>
+    <div class="eyebrow"><span class="onair">Épisode 1</span><span>Montage v29b · 31 min 59</span></div>
     <h1>Ma cité va parler</h1>
     <p class="lede">Écoute, et dès que quelque chose cloche, appuie sur « Noter ici ». La minute est prise toute seule : écris juste ce qui ne va pas. Chacun met son prénom, comme ça on sait qui a dit quoi. Tout le monde voit les notes de tout le monde.</p>
     <a href="https://open.spotify.com/show/1Ya1J6v4lqzxNlxfmfROy5" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;margin-top:12px;padding:12px 18px;border-radius:999px;background:var(--accent);color:var(--accent-ink);font-weight:700;text-decoration:none">🎧 Le podcast sur Spotify</a>
   </header>
 
   <section class="player" aria-label="Lecteur">
-    <audio id="audio" src="podcast.mp3?v=20" preload="metadata"></audio>
+    <audio id="audio" src="podcast.mp3?v=29" preload="metadata"></audio>
     <div class="row">
       <button class="play" id="play" aria-label="Lecture"><svg viewBox="0 0 24 24" id="playIcon"><path d="M7 4.5v15l13-7.5z"/></svg></button>
       <button id="back" aria-label="Reculer de 10 secondes">−10 s</button>
       <button id="fwd" aria-label="Avancer de 10 secondes">+10 s</button>
-      <div class="clock" aria-live="off"><span id="cur">0:00</span> <small>/ <span id="dur">25:03</span></small></div>
+      <div class="clock" aria-live="off"><span id="cur">0:00</span> <small>/ <span id="dur">31:59</span></small></div>
     </div>
     <div class="bar">
       <div class="ticks" id="ticks" aria-hidden="true"></div>
-      <input type="range" id="seek" min="0" max="2142" step="0.1" value="0" aria-label="Position dans le podcast">
+      <input type="range" id="seek" min="0" max="1920" step="0.1" value="0" aria-label="Position dans le podcast">
     </div>
     <div class="row">
       <button class="add" id="addBtn">Noter ici</button>
@@ -127,10 +127,10 @@ const SB='https://rlrazcitmwxfaxlnnfau.supabase.co/rest/v1/podcast_notes', KEY='
 const H={apikey:KEY,'Content-Type':'application/json'};
 const $=id=>document.getElementById(id);
 const audio=$('audio'), seek=$('seek');
-const VERSION='v20', EP='ep1';
+const VERSION='v29b', EP='ep1';
 let notes=[], noteT=0;
 const fmt=s=>{s=Math.max(0,Math.round(s));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
-const dur=()=>isFinite(audio.duration)&&audio.duration>0?audio.duration:2142;
+const dur=()=>isFinite(audio.duration)&&audio.duration>0?audio.duration:1920;
 const store={get(k){try{return localStorage.getItem(k)||''}catch(e){return ''}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
 $('nameIn').value=store.get('prenom');
 
